@@ -6,12 +6,12 @@
   <title>صفحة احترافية مع صور وصوت</title>
 
   <!-- إضافة Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GGYVYN7C0W"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-188RV2XQFE"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-GGYVYN7C0W');
+    gtag('config', 'G-188RV2XQFE');
   </script>
 
   <style>
@@ -19,13 +19,22 @@
       width: 100%;
       height: auto;
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
     h1 {
       text-align: center;
-      font-size: 2em;
-      margin-top: 20px;
+      font-size: 2.5em;
+      margin-top: 50px;
+      color: #333;
     }
 
     body {
@@ -57,24 +66,37 @@
       top: 20px;
       width: 100%;
       z-index: 100;
+      display: flex;
+      justify-content: center;
     }
 
     .container {
       margin-top: 100px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin: 20px;
+      display: block;
+      margin-top: 30px;
     }
-    
-    .gallery img {
-      width: 100%;
-      height: auto;
+
+    /* إضافة تنسيق لزر "لايك" */
+    .like-button {
+      background-color: #ff6600;
+      color: white;
+      padding: 15px 32px;
+      font-size: 20px;
+      border: none;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      margin-top: 30px;
+      transition: background-color 0.3s;
+    }
+
+    .like-button:hover {
+      background-color: #e55b00;
     }
   </style>
 </head>
@@ -88,7 +110,11 @@
   <div class="container">
     <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
-    <!-- عرض الصور باستخدام شبكة Grid -->
+    <!-- استبدال النص بزر "لايك" -->
+    <form action="https://formspree.io/f/xeoarlnb" method="POST">
+      <button class="like-button" type="submit">أعجبني</button>
+    </form>
+
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
       <img src="image2.jpg" alt="صورة 2">
