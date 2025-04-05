@@ -14,10 +14,6 @@
     gtag('config', 'G-188RV2XQFE');
   </script>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
-  
   <style>
     img {
       width: 100%;
@@ -84,7 +80,6 @@
       margin-top: 30px;
     }
 
-    /* إضافة تنسيق لزر "لايك" */
     .like-button {
       background-color: #ff6600;
       color: white;
@@ -100,11 +95,6 @@
     .like-button:hover {
       background-color: #e55b00;
     }
-
-    .like-count {
-      font-size: 1.2em;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
@@ -115,11 +105,11 @@
   </div>
 
   <div class="container">
-    <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
     <!-- استبدال النص بزر "لايك" -->
-    <button class="like-button" id="likeButton" onclick="toggleLike()">❤️ أعجبني</button>
-    <p class="like-count" id="likeCount">عدد الإعجابات: 0</p>
+    <form id="likeForm" action="https://formspree.io/f/xeoarlnb" method="POST">
+      <button class="like-button" type="submit">أعجبني ❤️</button>
+    </form>
 
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
@@ -152,42 +142,22 @@
       audio.pause();
     }
 
-    // إعدادات Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
-      authDomain: "professionalpagelikes.firebaseapp.com",
-      databaseURL: "https://professionalpagelikes-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "professionalpagelikes",
-      storageBucket: "professionalpagelikes.firebasestorage.app",
-      messagingSenderId: "107201511416",
-      appId: "1:107201511416:web:1db3dfab26f5e7911be00d",
-      measurementId: "G-SGCQXEHHGS"
-    };
+    // إرسال النموذج باستخدام AJAX لتجنب إعادة تحميل الصفحة
+    document.getElementById("likeForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // منع إعادة تحميل الصفحة
+      var formData = new FormData(this);
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // تحميل عدد الإعجابات من Firebase عند تحميل الصفحة
-    window.onload = function() {
-      const likesRef = database.ref('likes');
-      likesRef.on('value', function(snapshot) {
-        const likesCount = snapshot.val() || 0;
-        document.getElementById('likeCount').innerText = `عدد الإعجابات: ${likesCount}`;
+      fetch(this.action, {
+        method: this.method,
+        body: formData
+      })
+      .then(response => {
+        alert("تم إرسال التفاعل بنجاح!");
+      })
+      .catch(error => {
+        alert("حدث خطأ أثناء إرسال التفاعل.");
       });
-    }
-
-    // تغيير الحالة عند النقر على زر الإعجاب
-    function toggleLike() {
-      const likesRef = database.ref('likes');
-      likesRef.transaction(function(currentLikes) {
-        if (currentLikes === null) {
-          return 1;  // إذا لم يكن هناك عدد إعجابات في Firebase، اجعلها 1
-        } else {
-          return currentLikes + 1;  // زيادة عدد الإعجابات
-        }
-      });
-    }
+    });
   </script>
 
 </body>
