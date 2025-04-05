@@ -24,13 +24,6 @@
       transform: scale(1.05);
     }
 
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-top: 50px;
-      color: #333;
-    }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -76,7 +69,7 @@
       margin-top: 30px;
     }
 
-    /* إضافة تنسيق لزر "لايك" */
+    /* تحسين المظهر لزر "أعجبني" */
     .like-button {
       background-color: #ff6600;
       color: white;
@@ -87,10 +80,22 @@
       cursor: pointer;
       margin-top: 30px;
       transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .like-button:hover {
       background-color: #e55b00;
+    }
+
+    .like-icon {
+      font-size: 24px;
+    }
+
+    .like-count {
+      font-size: 18px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -102,11 +107,14 @@
   </div>
 
   <div class="container">
-    <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
+    <!-- إزالة عبارة "مرحبًا بك في الصفحة الاحترافية!" -->
     
-    <!-- استبدال النص بزر "لايك" -->
-    <button id="likeButton" class="like-button">❤️ أعجبني</button>
-    <div id="likeCount">عدد الإعجابات: 0</div>
+    <!-- زر "أعجبني" -->
+    <button id="likeButton" class="like-button">
+      <span id="likeIcon" class="like-icon">❤️</span> 
+      <span id="likeText">أعجبني</span>
+    </button>
+    <div id="likeCount" class="like-count">عدد الإعجابات: 0</div>
 
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
@@ -155,20 +163,20 @@
       audio.pause();
     }
 
-    // دالة لزيادة عدد الإعجابات
-    function increaseLikes() {
-      const likesRef = database.ref('likes');
-      likesRef.transaction(function(likes) {
-        if (likes === null) {
+    // دالة لزيادة أو تقليص عدد الإعجابات
+    function toggleLike() {
+      const likeRef = database.ref('likes');
+      likeRef.transaction(function(currentLikes) {
+        if (currentLikes === null) {
           return 1;
         } else {
-          return likes + 1;
+          return currentLikes + (currentLikes % 2 === 0 ? 1 : -1); // إذا كان العدد زوجي نزيده، وإذا كان فردي نقصه
         }
       });
     }
 
     // مستمع للنقر على زر الإعجاب
-    document.getElementById('likeButton').addEventListener('click', increaseLikes);
+    document.getElementById('likeButton').addEventListener('click', toggleLike);
 
     // عرض عدد الإعجابات في الصفحة
     const likeCountElement = document.getElementById("likeCount");
@@ -176,7 +184,7 @@
     // متابعة التغييرات في قاعدة البيانات بشكل فوري
     database.ref('likes').on('value', function(snapshot) {
       const likeCount = snapshot.val();
-      likeCountElement.textContent = "عدد الإعجابات: " + likeCount;
+      likeCountElement.textContent = "عدد الإعجابات: " + (likeCount || 0);
     });
   </script>
 
