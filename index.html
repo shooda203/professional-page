@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>صفحة احترافية مع صور وصوت</title>
+  <title></title>
 
   <!-- إضافة Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-188RV2XQFE"></script>
@@ -80,40 +80,27 @@
       margin-top: 30px;
     }
 
-    /* تعديل التنسيق لزر "إعجاب" */
-    .like-button {
-      background-color: #ff6600;
-      color: white;
-      padding: 15px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 30px;
-      transition: background-color 0.3s;
-    }
-
-    .like-button:hover {
-      background-color: #e55b00;
-    }
-
-    .heart-icon {
-      font-size: 30px;
-      color: grey;
-      cursor: pointer;
-    }
-
-    .liked {
-      color: red;
-    }
-
+    /* تعديل تنسيق زر الإعجاب */
     .like-container {
       position: fixed;
-      bottom: 20px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
+      font-size: 30px;
+      cursor: pointer;
+      color: #ccc;
+      transition: color 0.3s;
     }
+
+    .like-container.liked {
+      color: red;
+    }
+
+    .like-container:hover {
+      color: #ff5555;
+    }
+
   </style>
 </head>
 <body>
@@ -143,10 +130,7 @@
   </div>
 
   <!-- زر الإعجاب مع العد التفاعلي -->
-  <div class="like-container">
-    <span id="heart" class="heart-icon" onclick="toggleLike()">❤️</span>
-    <span id="likeCount">0</span> إعجابات
-  </div>
+  <div class="like-container" id="heart" onclick="toggleLike()">❤️</div>
 
   <script>
     // وظيفة لتشغيل الصوت
@@ -165,20 +149,16 @@
     let liked = false;
     let likeCount = localStorage.getItem('likeCount') || 0;
 
-    // تحديث عدد الإعجابات في الصفحة
-    document.getElementById('likeCount').innerText = likeCount;
-
     function toggleLike() {
+      liked = !liked;
       if (liked) {
-        likeCount--;
-        document.getElementById('heart').classList.remove('liked');
-      } else {
         likeCount++;
         document.getElementById('heart').classList.add('liked');
+      } else {
+        likeCount--;
+        document.getElementById('heart').classList.remove('liked');
       }
-      liked = !liked;
       localStorage.setItem('likeCount', likeCount);  // حفظ العدد في التخزين المحلي
-      document.getElementById('likeCount').innerText = likeCount;
     }
   </script>
 
