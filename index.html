@@ -14,12 +14,11 @@
     gtag('config', 'G-188RV2XQFE');
   </script>
 
-  <!-- إضافة Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
   
   <style>
-    /* بعض التنسيقات */
     img {
       width: 100%;
       height: auto;
@@ -48,6 +47,44 @@
       text-align: center;
     }
 
+    .play-button, .pause-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 32px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .play-button:hover, .pause-button:hover {
+      background-color: #45a049;
+    }
+
+    .button-container {
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      margin-top: 100px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .gallery {
+      display: block;
+      margin-top: 30px;
+    }
+
+    /* إضافة تنسيق لزر "لايك" */
     .like-button {
       background-color: #ff6600;
       color: white;
@@ -64,25 +101,36 @@
       background-color: #e55b00;
     }
 
-    .count {
-      font-size: 20px;
+    .like-count {
+      font-size: 1.2em;
       margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
+  <div class="button-container">
+    <button class="play-button" onclick="playAudio()">تشغيل الصوت</button>
+    <button class="pause-button" onclick="pauseAudio()">إيقاف الصوت</button>
+  </div>
+
   <div class="container">
     <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
-    <!-- زر "أعجبني" -->
-    <button class="like-button" id="likeButton">أعجبني ❤️</button>
-    <div class="count">عدد الإعجابات: <span id="likeCount">0</span></div>
+    <!-- استبدال النص بزر "لايك" -->
+    <button class="like-button" id="likeButton" onclick="toggleLike()">❤️ أعجبني</button>
+    <p class="like-count" id="likeCount">عدد الإعجابات: 0</p>
 
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
       <img src="image2.jpg" alt="صورة 2">
       <img src="image3.jpg" alt="صورة 3">
+      <img src="image4.jpg" alt="صورة 4">
+      <img src="image5.jpg" alt="صورة 5">
+      <img src="image6.jpg" alt="صورة 6">
+      <img src="image7.jpg" alt="صورة 7">
+      <img src="image8.jpg" alt="صورة 8">
+      <img src="image9.jpg" alt="صورة 9">
     </div>
 
     <audio id="myAudio" loop>
@@ -92,7 +140,19 @@
   </div>
 
   <script>
-    // تهيئة Firebase
+    // وظيفة لتشغيل الصوت
+    function playAudio() {
+      var audio = document.getElementById('myAudio');
+      audio.play();
+    }
+
+    // وظيفة لإيقاف الصوت
+    function pauseAudio() {
+      var audio = document.getElementById('myAudio');
+      audio.pause();
+    }
+
+    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
       authDomain: "professionalpagelikes.firebaseapp.com",
@@ -104,44 +164,30 @@
       measurementId: "G-SGCQXEHHGS"
     };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
+    const database = firebase.database();
 
-    // متغير لحفظ عدد الإعجابات
-    const likeCountElement = document.getElementById("likeCount");
-
-    // قراءة عدد الإعجابات من قاعدة البيانات
-    function readLikes() {
-      const likeRef = database.ref("likes");
-      likeRef.get().then((snapshot) => {
-        if (snapshot.exists()) {
-          likeCountElement.textContent = snapshot.val();
-        } else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
+    // تحميل عدد الإعجابات من Firebase عند تحميل الصفحة
+    window.onload = function() {
+      const likesRef = database.ref('likes');
+      likesRef.on('value', function(snapshot) {
+        const likesCount = snapshot.val() || 0;
+        document.getElementById('likeCount').innerText = `عدد الإعجابات: ${likesCount}`;
       });
     }
 
-    // تحديث عدد الإعجابات في قاعدة البيانات عند النقر على الزر
-    document.getElementById("likeButton").addEventListener("click", function() {
-      const likeRef = database.ref("likes");
-
-      likeRef.transaction((currentLikes) => {
-        return (currentLikes || 0) + 1;
-      }, (error, committed, snapshot) => {
-        if (error) {
-          console.error("Transaction failed", error);
-        } else if (committed) {
-          console.log("Transaction committed");
+    // تغيير الحالة عند النقر على زر الإعجاب
+    function toggleLike() {
+      const likesRef = database.ref('likes');
+      likesRef.transaction(function(currentLikes) {
+        if (currentLikes === null) {
+          return 1;  // إذا لم يكن هناك عدد إعجابات في Firebase، اجعلها 1
+        } else {
+          return currentLikes + 1;  // زيادة عدد الإعجابات
         }
-        likeCountElement.textContent = snapshot.val();
       });
-    });
-
-    // استدعاء الدالة لقراءة عدد الإعجابات عند تحميل الصفحة
-    readLikes();
+    }
   </script>
 
 </body>
