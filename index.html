@@ -4,13 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة احترافية مع صور وصوت</title>
-  
+
+  <!-- إضافة Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-188RV2XQFE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-188RV2XQFE');
+  </script>
+
   <!-- إضافة Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-analytics.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
   
   <style>
+    /* بعض التنسيقات */
     img {
       width: 100%;
       height: auto;
@@ -24,6 +33,13 @@
       transform: scale(1.05);
     }
 
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-top: 50px;
+      color: #333;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -32,44 +48,6 @@
       text-align: center;
     }
 
-    .play-button, .pause-button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
-
-    .play-button:hover, .pause-button:hover {
-      background-color: #45a049;
-    }
-
-    .button-container {
-      position: fixed;
-      top: 20px;
-      width: 100%;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      margin-top: 100px;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .gallery {
-      display: block;
-      margin-top: 30px;
-    }
-
-    /* تحسين المظهر لزر "أعجبني" */
     .like-button {
       background-color: #ff6600;
       color: white;
@@ -80,52 +58,31 @@
       cursor: pointer;
       margin-top: 30px;
       transition: background-color 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .like-button:hover {
       background-color: #e55b00;
     }
 
-    .like-icon {
-      font-size: 24px;
-    }
-
-    .like-count {
-      font-size: 18px;
+    .count {
+      font-size: 20px;
       margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="button-container">
-    <button class="play-button" onclick="playAudio()">تشغيل الصوت</button>
-    <button class="pause-button" onclick="pauseAudio()">إيقاف الصوت</button>
-  </div>
-
   <div class="container">
-    <!-- إزالة عبارة "مرحبًا بك في الصفحة الاحترافية!" -->
+    <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
     <!-- زر "أعجبني" -->
-    <button id="likeButton" class="like-button">
-      <span id="likeIcon" class="like-icon">❤️</span> 
-      <span id="likeText">أعجبني</span>
-    </button>
-    <div id="likeCount" class="like-count">عدد الإعجابات: 0</div>
+    <button class="like-button" id="likeButton">أعجبني ❤️</button>
+    <div class="count">عدد الإعجابات: <span id="likeCount">0</span></div>
 
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
       <img src="image2.jpg" alt="صورة 2">
       <img src="image3.jpg" alt="صورة 3">
-      <img src="image4.jpg" alt="صورة 4">
-      <img src="image5.jpg" alt="صورة 5">
-      <img src="image6.jpg" alt="صورة 6">
-      <img src="image7.jpg" alt="صورة 7">
-      <img src="image8.jpg" alt="صورة 8">
-      <img src="image9.jpg" alt="صورة 9">
     </div>
 
     <audio id="myAudio" loop>
@@ -135,7 +92,7 @@
   </div>
 
   <script>
-    // إعداد Firebase
+    // تهيئة Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
       authDomain: "professionalpagelikes.firebaseapp.com",
@@ -147,45 +104,44 @@
       measurementId: "G-SGCQXEHHGS"
     };
 
-    // تهيئة Firebase
     const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const database = firebase.database(app);
 
-    // دالة لتشغيل الصوت
-    function playAudio() {
-      var audio = document.getElementById('myAudio');
-      audio.play();
-    }
+    // متغير لحفظ عدد الإعجابات
+    const likeCountElement = document.getElementById("likeCount");
 
-    // دالة لإيقاف الصوت
-    function pauseAudio() {
-      var audio = document.getElementById('myAudio');
-      audio.pause();
-    }
-
-    // دالة لزيادة أو تقليص عدد الإعجابات
-    function toggleLike() {
-      const likeRef = database.ref('likes');
-      likeRef.transaction(function(currentLikes) {
-        if (currentLikes === null) {
-          return 1;
+    // قراءة عدد الإعجابات من قاعدة البيانات
+    function readLikes() {
+      const likeRef = database.ref("likes");
+      likeRef.get().then((snapshot) => {
+        if (snapshot.exists()) {
+          likeCountElement.textContent = snapshot.val();
         } else {
-          return currentLikes + (currentLikes % 2 === 0 ? 1 : -1); // إذا كان العدد زوجي نزيده، وإذا كان فردي نقصه
+          console.log("No data available");
         }
+      }).catch((error) => {
+        console.error(error);
       });
     }
 
-    // مستمع للنقر على زر الإعجاب
-    document.getElementById('likeButton').addEventListener('click', toggleLike);
+    // تحديث عدد الإعجابات في قاعدة البيانات عند النقر على الزر
+    document.getElementById("likeButton").addEventListener("click", function() {
+      const likeRef = database.ref("likes");
 
-    // عرض عدد الإعجابات في الصفحة
-    const likeCountElement = document.getElementById("likeCount");
-
-    // متابعة التغييرات في قاعدة البيانات بشكل فوري
-    database.ref('likes').on('value', function(snapshot) {
-      const likeCount = snapshot.val();
-      likeCountElement.textContent = "عدد الإعجابات: " + (likeCount || 0);
+      likeRef.transaction((currentLikes) => {
+        return (currentLikes || 0) + 1;
+      }, (error, committed, snapshot) => {
+        if (error) {
+          console.error("Transaction failed", error);
+        } else if (committed) {
+          console.log("Transaction committed");
+        }
+        likeCountElement.textContent = snapshot.val();
+      });
     });
+
+    // استدعاء الدالة لقراءة عدد الإعجابات عند تحميل الصفحة
+    readLikes();
   </script>
 
 </body>
