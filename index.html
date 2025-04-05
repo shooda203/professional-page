@@ -80,6 +80,7 @@
       margin-top: 30px;
     }
 
+    /* إضافة تنسيق لزر "لايك" */
     .like-button {
       background-color: #ff6600;
       color: white;
@@ -95,6 +96,16 @@
     .like-button:hover {
       background-color: #e55b00;
     }
+
+    .heart-icon {
+      font-size: 30px;
+      color: grey;
+      cursor: pointer;
+    }
+
+    .liked {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -105,12 +116,8 @@
   </div>
 
   <div class="container">
+    <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
-    <!-- استبدال النص بزر "لايك" -->
-    <form id="likeForm" action="https://formspree.io/f/xeoarlnb" method="POST">
-      <button class="like-button" type="submit">أعجبني ❤️</button>
-    </form>
-
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1">
       <img src="image2.jpg" alt="صورة 2">
@@ -127,6 +134,12 @@
       <source src="shahad.mp3" type="audio/mp3">
       متصفحك لا يدعم تشغيل الصوت.
     </audio>
+
+    <!-- زر الإعجاب مع العد التفاعلي -->
+    <div>
+      <span id="heart" class="heart-icon" onclick="toggleLike()">❤️</span>
+      <span id="likeCount">0</span> إعجابات
+    </div>
   </div>
 
   <script>
@@ -142,22 +155,25 @@
       audio.pause();
     }
 
-    // إرسال النموذج باستخدام AJAX لتجنب إعادة تحميل الصفحة
-    document.getElementById("likeForm").addEventListener("submit", function(event) {
-      event.preventDefault(); // منع إعادة تحميل الصفحة
-      var formData = new FormData(this);
+    // كود لإدارة الإعجاب
+    let liked = false;
+    let likeCount = localStorage.getItem('likeCount') || 0;
 
-      fetch(this.action, {
-        method: this.method,
-        body: formData
-      })
-      .then(response => {
-        alert("تم إرسال التفاعل بنجاح!");
-      })
-      .catch(error => {
-        alert("حدث خطأ أثناء إرسال التفاعل.");
-      });
-    });
+    // تحديث عدد الإعجابات في الصفحة
+    document.getElementById('likeCount').innerText = likeCount;
+
+    function toggleLike() {
+      if (liked) {
+        likeCount--;
+        document.getElementById('heart').classList.remove('liked');
+      } else {
+        likeCount++;
+        document.getElementById('heart').classList.add('liked');
+      }
+      liked = !liked;
+      localStorage.setItem('likeCount', likeCount);  // حفظ العدد في التخزين المحلي
+      document.getElementById('likeCount').innerText = likeCount;
+    }
   </script>
 
 </body>
