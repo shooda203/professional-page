@@ -96,6 +96,13 @@
     .like-button:hover {
       background-color: #e55b00;
     }
+
+    /* إضافة تنسيق لعدد الإعجابات */
+    .like-count {
+      font-size: 1.5em;
+      color: #333;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -110,8 +117,11 @@
     
     <!-- استبدال النص بزر "لايك" -->
     <form id="likeForm" action="https://formspree.io/f/xeoarlnb" method="POST">
-      <button class="like-button" type="submit">أعجبني</button>
+      <button class="like-button" type="submit" onclick="increaseLikes(event)">أعجبني</button>
     </form>
+
+    <!-- عدد الإعجابات -->
+    <div id="likeCount" class="like-count">عدد الإعجابات: 0</div>
 
     <div class="gallery">
       <img src="image1.jpg" alt="صورة 1" onerror="this.src='default.jpg';">
@@ -144,22 +154,28 @@
       audio.pause();
     }
 
-    // إرسال النموذج باستخدام AJAX لتجنب إعادة تحميل الصفحة
-    document.getElementById("likeForm").addEventListener("submit", function(event) {
-      event.preventDefault(); // منع إعادة تحميل الصفحة
-      var formData = new FormData(this);
+    // زيادة عدد الإعجابات وتخزينه في الذاكرة المحلية
+    function increaseLikes(event) {
+      event.preventDefault(); // منع إعادة إرسال النموذج
 
-      fetch(this.action, {
-        method: this.method,
-        body: formData
-      })
-      .then(response => {
-        alert("تم إرسال التفاعل بنجاح!");
-      })
-      .catch(error => {
-        alert("حدث خطأ أثناء إرسال التفاعل.");
-      });
-    });
+      // الحصول على العدد الحالي للإعجابات من localStorage أو تعيينه إلى 0 إذا لم يكن موجوداً
+      let likeCount = parseInt(localStorage.getItem("likes")) || 0;
+
+      // زيادة العدد
+      likeCount++;
+
+      // تخزين العدد الجديد في localStorage
+      localStorage.setItem("likes", likeCount);
+
+      // تحديث عدد الإعجابات على الصفحة
+      document.getElementById("likeCount").textContent = `عدد الإعجابات: ${likeCount}`;
+    }
+
+    // عند تحميل الصفحة، قم بتحميل العدد المحفوظ من الذاكرة المحلية
+    window.onload = function() {
+      let likeCount = parseInt(localStorage.getItem("likes")) || 0;
+      document.getElementById("likeCount").textContent = `عدد الإعجابات: ${likeCount}`;
+    }
   </script>
 
 </body>
