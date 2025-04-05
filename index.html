@@ -82,19 +82,17 @@
 
     /* إضافة تنسيق لزر "لايك" */
     .like-button {
-      background-color: #ff6600;
-      color: white;
-      padding: 15px 32px;
-      font-size: 20px;
+      background-color: transparent;
+      color: #ff6600;
+      font-size: 40px;
       border: none;
-      border-radius: 8px;
       cursor: pointer;
       margin-top: 30px;
-      transition: background-color 0.3s;
+      transition: color 0.3s;
     }
 
     .like-button:hover {
-      background-color: #e55b00;
+      color: #e55b00;
     }
 
     /* إضافة تنسيق لعدد الإعجابات */
@@ -102,6 +100,10 @@
       font-size: 1.5em;
       color: #333;
       margin-top: 10px;
+    }
+
+    .liked {
+      color: red;
     }
   </style>
 </head>
@@ -115,10 +117,10 @@
   <div class="container">
     <h1>مرحبًا بك في الصفحة الاحترافية!</h1>
     
-    <!-- استبدال النص بزر "لايك" -->
-    <form id="likeForm" action="https://formspree.io/f/xeoarlnb" method="POST">
-      <button class="like-button" type="submit" onclick="increaseLikes(event)">أعجبني</button>
-    </form>
+    <!-- زر "لايك" بشكل قلب -->
+    <button id="likeButton" class="like-button" onclick="toggleLike()">
+      ❤️
+    </button>
 
     <!-- عدد الإعجابات -->
     <div id="likeCount" class="like-count">عدد الإعجابات: 0</div>
@@ -154,25 +156,36 @@
       audio.pause();
     }
 
-    // زيادة عدد الإعجابات وتخزينه في الذاكرة المحلية
-    function increaseLikes(event) {
-      event.preventDefault(); // منع إعادة إرسال النموذج
-
-      // الحصول على العدد الحالي للإعجابات من localStorage أو تعيينه إلى 0 إذا لم يكن موجوداً
+    // وظيفة لتبديل حالة الإعجاب (زيادة/إنقاص)
+    function toggleLike() {
+      // التحقق مما إذا كان المستخدم قد أعجب بالفعل
       let likeCount = parseInt(localStorage.getItem("likes")) || 0;
 
-      // زيادة العدد
-      likeCount++;
+      // التحقق مما إذا كان الزر قد تم النقر عليه
+      if (localStorage.getItem("liked") === "true") {
+        // إذا كان قد تم الإعجاب بالفعل، نقوم بإنقاص العدد
+        likeCount--;
+        document.getElementById("likeButton").classList.remove("liked");
+        localStorage.setItem("liked", "false");
+      } else {
+        // إذا لم يكن قد تم الإعجاب بعد، نقوم بزيادة العدد
+        likeCount++;
+        document.getElementById("likeButton").classList.add("liked");
+        localStorage.setItem("liked", "true");
+      }
 
       // تخزين العدد الجديد في localStorage
       localStorage.setItem("likes", likeCount);
 
-      // تحديث عدد الإعجابات على الصفحة
+      // تحديث عدد الإعجابات في الصفحة
       document.getElementById("likeCount").textContent = `عدد الإعجابات: ${likeCount}`;
     }
 
-    // عند تحميل الصفحة، قم بتحميل العدد المحفوظ من الذاكرة المحلية
+    // عند تحميل الصفحة، قم بتحميل العدد المحفوظ من localStorage
     window.onload = function() {
+      if (localStorage.getItem("liked") === "true") {
+        document.getElementById("likeButton").classList.add("liked");
+      }
       let likeCount = parseInt(localStorage.getItem("likes")) || 0;
       document.getElementById("likeCount").textContent = `عدد الإعجابات: ${likeCount}`;
     }
