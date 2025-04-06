@@ -5,50 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة تفاعلية</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-  <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
-      authDomain: "professionalpagelikes.firebaseapp.com",
-      databaseURL: "https://professionalpagelikes-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "professionalpagelikes",
-      storageBucket: "professionalpagelikes.firebasestorage.app",
-      messagingSenderId: "107201511416",
-      appId: "1:107201511416:web:1db3dfab26f5e7911be00d",
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Reference to likes count in Firebase
-    const likesRef = database.ref('likes');
-
-    // Get initial likes count from Firebase
-    likesRef.once('value', function(snapshot) {
-      const likeCount = snapshot.val() || 0;
-      document.getElementById('likeCount').innerText = likeCount;
-    });
-
-    // Function to toggle like
-    function toggleLike() {
-      likesRef.transaction(function(likes) {
-        return (likes || 0) + 1; // Increment the likes
-      }, function(error, committed, snapshot) {
-        if (error) {
-          console.error('Error incrementing likes:', error);
-        } else if (committed) {
-          document.getElementById('likeCount').innerText = snapshot.val();
-        }
-      });
-    }
-  </script>
-
   <style>
-    /* Ensure the body layout */
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-top: 50px;
+      color: #333;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -57,42 +34,6 @@
       text-align: center;
     }
 
-    /* Center the play/pause buttons at the top */
-    .button-container {
-      position: fixed;
-      top: 20px;
-      width: 100%;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-    }
-
-    /* Gallery styling */
-    .container {
-      margin-top: 100px;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .gallery {
-      display: block;
-      margin-top: 30px;
-    }
-
-    .gallery img {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
-      margin-bottom: 15px;
-    }
-
-    .gallery img:hover {
-      transform: scale(1.05);
-    }
-
-    /* Button Styling */
     .play-button, .pause-button {
       background-color: #4CAF50;
       color: white;
@@ -109,14 +50,35 @@
       background-color: #45a049;
     }
 
-    /* Like Button Styling */
+    .button-container {
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      margin-top: 100px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .gallery {
+      display: block;
+      margin-top: 30px;
+    }
+
+    /* تعديل الإطار الذي يحتوي على القلب */
     .like-container {
       position: fixed;
-      bottom: 30px;
+      bottom: 30px; /* نقلها إلى الأسفل */
       left: 50%;
       transform: translateX(-50%);
       background-color: #fff;
-      border: 2px solid #ccc;
+      border: 2px solid #ccc;  /* إطار حول زر الإعجاب */
       padding: 10px 20px;
       border-radius: 30px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -176,7 +138,25 @@
     <span id="likeCount" class="like-count">0</span> إعجابات
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
   <script>
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
+      authDomain: "professionalpagelikes.firebaseapp.com",
+      databaseURL: "https://professionalpagelikes-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "professionalpagelikes",
+      storageBucket: "professionalpagelikes.firebasestorage.app",
+      messagingSenderId: "107201511416",
+      appId: "1:107201511416:web:1db3dfab26f5e7911be00d",
+      measurementId: "G-SGCQXEHHGS"
+    };
+    
+    // تهيئة التطبيق
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database(app);
+
     // وظيفة لتشغيل الصوت
     function playAudio() {
       var audio = document.getElementById('myAudio');
@@ -187,6 +167,22 @@
     function pauseAudio() {
       var audio = document.getElementById('myAudio');
       audio.pause();
+    }
+
+    // استرجاع عدد الإعجابات من قاعدة البيانات
+    let likesRef = database.ref('likes');
+
+    // تحديث واجهة المستخدم بناءً على عدد الإعجابات
+    likesRef.on('value', function(snapshot) {
+      let likes = snapshot.val() || 0;
+      document.getElementById('likeCount').innerText = likes;
+    });
+
+    // تحديث عدد الإعجابات في قاعدة البيانات
+    function toggleLike() {
+      likesRef.transaction(function(currentLikes) {
+        return (currentLikes || 0) + 1;  // زيادة الإعجاب بمقدار 1
+      });
     }
   </script>
 
