@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة تفاعلية</title>
 
-  <!-- Firebase SDK -->
+  <!-- إضافة رابط Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
 
@@ -118,7 +118,7 @@
   </div>
 
   <script>
-    // Firebase initialization
+    // إعدادات Firebase الخاصة بك
     const firebaseConfig = {
       apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
       authDomain: "professionalpagelikes.firebaseapp.com",
@@ -130,42 +130,42 @@
       measurementId: "G-SGCQXEHHGS"
     };
 
-    // Initialize Firebase
+    // تهيئة Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database(app);
 
-    // Initialize likesRef correctly here, before any functions use it
+    // مرجع للـ likes في قاعدة البيانات
     const likesRef = database.ref("likes");
 
-    // Update the like count in real-time
+    // تحديث العدد في الوقت الحقيقي
     likesRef.on("value", (snapshot) => {
       const likeCount = snapshot.val() || 0;
       document.getElementById("likeCount").innerText = likeCount;
       document.getElementById('heart').classList.toggle('liked', likeCount % 2 === 1);
     });
 
-    // Play audio function
+    // دالة لتشغيل الصوت
     function playAudio() {
       const audio = document.getElementById('myAudio');
       audio.play();
     }
 
-    // Pause audio function
+    // دالة لإيقاف الصوت
     function pauseAudio() {
       const audio = document.getElementById('myAudio');
       audio.pause();
     }
 
-    // Like management function
+    // دالة لإدارة الإعجابات
     function toggleLike() {
       likesRef.transaction((currentLikes) => {
-        return (currentLikes || 0) + 1;  // Increment like count by 1
+        return (currentLikes || 0) + 1;
       }, (error, committed) => {
         if (error) {
-          console.error('Transaction failed:', error);
+          console.error('فشلت العملية:', error);
         } else if (committed) {
           const heart = document.getElementById('heart');
-          heart.classList.toggle('liked');  // Toggle heart color on click
+          heart.classList.toggle('liked');
         }
       });
     }
