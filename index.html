@@ -134,6 +134,13 @@
     // مرجع للـ likes في قاعدة البيانات
     const likesRef = database.ref("likes");
 
+    // تحديث العدد في الوقت الحقيقي
+    likesRef.on("value", (snapshot) => {
+      const likeCount = snapshot.val() || 0;
+      document.getElementById("likeCount").innerText = likeCount;
+      document.getElementById('heart').classList.toggle('liked', likeCount % 2 === 1);
+    });
+
     // دالة لتشغيل الصوت
     function playAudio() {
       const audio = document.getElementById('myAudio');
@@ -146,30 +153,17 @@
       audio.pause();
     }
 
-    // استرجاع عدد الإعجابات من قاعدة البيانات
-    likesRef.once("value", function(snapshot) {
-      let likeCount = snapshot.val() || 0;
-      document.getElementById("likeCount").innerText = likeCount;
-    });
-
-    // دالة لزيادة أو تقليل عدد الإعجابات
+    // دالة لإدارة الإعجابات
     function toggleLike() {
-      likesRef.once("value", function(snapshot) {
-        let likeCount = snapshot.val() || 0;
-
-        // إذا تم النقر على "إعجاب"، زيادة العدد أو تقليله بناءً على حالة "الإعجاب"
-        if (document.getElementById('heart').classList.contains('liked')) {
-          likeCount--;
-        } else {
-          likeCount++;
+      likesRef.transaction((currentLikes) => {
+        return (currentLikes || 0) + 1;
+      }, (error, committed) => {
+        if (error) {
+          console.error('فشلت العملية:', error);
+        } else if (committed) {
+          const heart = document.getElementById('heart');
+          heart.classList.toggle('liked');
         }
-
-        // تحديث القيمة في قاعدة البيانات
-        likesRef.set(likeCount);
-
-        // تحديث واجهة المستخدم
-        document.getElementById('likeCount').innerText = likeCount;
-        document.getElementById('heart').classList.toggle('liked');
       });
     }
   </script>
