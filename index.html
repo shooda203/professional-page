@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>صفحة تفاعلية</title>
+
+  <!-- إعداد Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
 
   <style>
     img {
@@ -139,6 +143,22 @@
   </div>
 
   <script>
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
+      authDomain: "professionalpagelikes.firebaseapp.com",
+      databaseURL: "https://professionalpagelikes-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "professionalpagelikes",
+      storageBucket: "professionalpagelikes.appspot.com",
+      messagingSenderId: "107201511416",
+      appId: "1:107201511416:web:1db3dfab26f5e7911be00d",
+      measurementId: "G-SGCQXEHHGS"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     // وظيفة لتشغيل الصوت
     function playAudio() {
       var audio = document.getElementById('myAudio');
@@ -151,24 +171,23 @@
       audio.pause();
     }
 
+    // قراءة عدد الإعجابات من قاعدة البيانات Firebase عند تحميل الصفحة
+    const likesRef = database.ref('likes');
+    likesRef.on('value', function(snapshot) {
+      const likesCount = snapshot.val();
+      document.getElementById('likeCount').innerText = likesCount || 0;
+    });
+
     // كود لإدارة الإعجاب
-    let liked = false;
-    let likeCount = localStorage.getItem('likeCount') || 0;
-
-    // تحديث عدد الإعجابات في الصفحة
-    document.getElementById('likeCount').innerText = likeCount;
-
     function toggleLike() {
-      if (liked) {
-        likeCount--;
-        document.getElementById('heart').classList.remove('liked');
-      } else {
-        likeCount++;
-        document.getElementById('heart').classList.add('liked');
-      }
-      liked = !liked;
-      localStorage.setItem('likeCount', likeCount);  // حفظ العدد في التخزين المحلي
-      document.getElementById('likeCount').innerText = likeCount;
+      const likesRef = database.ref('likes');
+      likesRef.transaction(function(currentLikes) {
+        if (currentLikes === null) {
+          return 1; // إذا لم يكن هناك عدد إعجابات في Firebase، اجعلها 1
+        } else {
+          return currentLikes + 1; // زيادة عدد الإعجابات
+        }
+      });
     }
   </script>
 
