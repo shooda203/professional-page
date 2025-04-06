@@ -5,27 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة تفاعلية</title>
 
+  <!-- إضافة رابط Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+
   <style>
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
-    }
-
-    img:hover {
-      transform: scale(1.05);
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-top: 50px;
-      color: #333;
-    }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -34,20 +18,10 @@
       text-align: center;
     }
 
-    .play-button, .pause-button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
-
-    .play-button:hover, .pause-button:hover {
-      background-color: #45a049;
+    h1 {
+      font-size: 2.5em;
+      margin-top: 50px;
+      color: #333;
     }
 
     .button-container {
@@ -59,26 +33,13 @@
       justify-content: center;
     }
 
-    .container {
-      margin-top: 100px;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .gallery {
-      display: block;
-      margin-top: 30px;
-    }
-
-    /* تعديل الإطار الذي يحتوي على القلب */
     .like-container {
       position: fixed;
-      bottom: 30px; /* نقلها إلى الأسفل */
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       background-color: #fff;
-      border: 2px solid #ccc;  /* إطار حول زر الإعجاب */
+      border: 2px solid #ccc;
       padding: 10px 20px;
       border-radius: 30px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -104,33 +65,48 @@
       font-size: 18px;
       color: #333;
     }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    .gallery {
+      display: block;
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
+
+  <h1>مرحبًا بك في الصفحة التفاعلية</h1>
 
   <div class="button-container">
     <button class="play-button" onclick="playAudio()">تشغيل الصوت</button>
     <button class="pause-button" onclick="pauseAudio()">إيقاف الصوت</button>
   </div>
 
-  <div class="container">
-    <div class="gallery">
-      <img src="image1.jpg" alt="صورة 1">
-      <img src="image2.jpg" alt="صورة 2">
-      <img src="image3.jpg" alt="صورة 3">
-      <img src="image4.jpg" alt="صورة 4">
-      <img src="image5.jpg" alt="صورة 5">
-      <img src="image6.jpg" alt="صورة 6">
-      <img src="image7.jpg" alt="صورة 7">
-      <img src="image8.jpg" alt="صورة 8">
-      <img src="image9.jpg" alt="صورة 9">
-    </div>
-
-    <audio id="myAudio" loop>
-      <source src="shahad.mp3" type="audio/mp3">
-      متصفحك لا يدعم تشغيل الصوت.
-    </audio>
+  <div class="gallery">
+    <img src="image1.jpg" alt="صورة 1">
+    <img src="image2.jpg" alt="صورة 2">
+    <img src="image3.jpg" alt="صورة 3">
+    <img src="image4.jpg" alt="صورة 4">
+    <img src="image5.jpg" alt="صورة 5">
+    <img src="image6.jpg" alt="صورة 6">
   </div>
+
+  <audio id="myAudio" loop>
+    <source src="shahad.mp3" type="audio/mp3">
+    متصفحك لا يدعم تشغيل الصوت.
+  </audio>
 
   <!-- زر الإعجاب مع العد التفاعلي -->
   <div class="like-container">
@@ -138,10 +114,8 @@
     <span id="likeCount" class="like-count">0</span> إعجابات
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
   <script>
-    // إعداد Firebase
+    // إعدادات Firebase الخاصة بك
     const firebaseConfig = {
       apiKey: "AIzaSyADz8tMWagqfEtSnMEg2WfeXrLeKNzvicA",
       authDomain: "professionalpagelikes.firebaseapp.com",
@@ -152,36 +126,50 @@
       appId: "1:107201511416:web:1db3dfab26f5e7911be00d",
       measurementId: "G-SGCQXEHHGS"
     };
-    
-    // تهيئة التطبيق
+
+    // تهيئة Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database(app);
 
-    // وظيفة لتشغيل الصوت
+    // مرجع للـ likes في قاعدة البيانات
+    const likesRef = database.ref("likes");
+
+    // دالة لتشغيل الصوت
     function playAudio() {
-      var audio = document.getElementById('myAudio');
+      const audio = document.getElementById('myAudio');
       audio.play();
     }
 
-    // وظيفة لإيقاف الصوت
+    // دالة لإيقاف الصوت
     function pauseAudio() {
-      var audio = document.getElementById('myAudio');
+      const audio = document.getElementById('myAudio');
       audio.pause();
     }
 
     // استرجاع عدد الإعجابات من قاعدة البيانات
-    let likesRef = database.ref('likes');
-
-    // تحديث واجهة المستخدم بناءً على عدد الإعجابات
-    likesRef.on('value', function(snapshot) {
-      let likes = snapshot.val() || 0;
-      document.getElementById('likeCount').innerText = likes;
+    likesRef.once("value", function(snapshot) {
+      let likeCount = snapshot.val() || 0;
+      document.getElementById("likeCount").innerText = likeCount;
     });
 
-    // تحديث عدد الإعجابات في قاعدة البيانات
+    // دالة لزيادة أو تقليل عدد الإعجابات
     function toggleLike() {
-      likesRef.transaction(function(currentLikes) {
-        return (currentLikes || 0) + 1;  // زيادة الإعجاب بمقدار 1
+      likesRef.once("value", function(snapshot) {
+        let likeCount = snapshot.val() || 0;
+
+        // إذا تم النقر على "إعجاب"، زيادة العدد أو تقليله بناءً على حالة "الإعجاب"
+        if (document.getElementById('heart').classList.contains('liked')) {
+          likeCount--;
+        } else {
+          likeCount++;
+        }
+
+        // تحديث القيمة في قاعدة البيانات
+        likesRef.set(likeCount);
+
+        // تحديث واجهة المستخدم
+        document.getElementById('likeCount').innerText = likeCount;
+        document.getElementById('heart').classList.toggle('liked');
       });
     }
   </script>
