@@ -5,90 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة تفاعلية</title>
 
-  <!-- إضافة Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-188RV2XQFE"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-188RV2XQFE');
-  </script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-
-    .button-container {
-      position: fixed;
-      top: 20px;
-      width: 100%;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      margin-top: 100px;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .like-container {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #fff;
-      border: 2px solid #ccc;
-      padding: 10px 20px;
-      border-radius: 30px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .heart-icon {
-      font-size: 30px;
-      color: #ccc;
-      cursor: pointer;
-      transition: color 0.3s;
-    }
-
-    .heart-icon.liked {
-      color: red;
-    }
-
-    .like-count {
-      font-size: 18px;
-      color: #333;
-    }
-
-    .play-button, .pause-button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px 32px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
-
-    .play-button:hover, .pause-button:hover {
-      background-color: #45a049;
-    }
-  </style>
-
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
@@ -130,8 +46,105 @@
       });
     }
   </script>
-</head>
 
+  <style>
+    /* Ensure the body layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    /* Center the play/pause buttons at the top */
+    .button-container {
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Gallery styling */
+    .container {
+      margin-top: 100px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Button Styling */
+    .play-button, .pause-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 32px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .play-button:hover, .pause-button:hover {
+      background-color: #45a049;
+    }
+
+    /* Like Button Styling */
+    .like-container {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff;
+      border: 2px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .heart-icon {
+      font-size: 30px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .heart-icon.liked {
+      color: red;
+    }
+
+    .like-count {
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
 <body>
 
   <div class="button-container">
