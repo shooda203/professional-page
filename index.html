@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>صفحة تفاعلية</title>
 
-  <!-- إعداد Firebase -->
+  <!-- تحميل مكتبات Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
 
@@ -121,7 +121,14 @@
 
     // تهيئة Firebase
     const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const database = firebase.database(app);
+
+    // قراءة عدد الإعجابات من قاعدة البيانات Firebase عند تحميل الصفحة
+    const likesRef = database.ref('likes');
+    likesRef.on('value', function(snapshot) {
+      const likesCount = snapshot.val();
+      document.getElementById('likeCount').innerText = likesCount || 0;
+    });
 
     // وظيفة لتشغيل الصوت
     function playAudio() {
@@ -134,13 +141,6 @@
       var audio = document.getElementById('myAudio');
       audio.pause();
     }
-
-    // قراءة عدد الإعجابات من قاعدة البيانات Firebase عند تحميل الصفحة
-    const likesRef = database.ref('likes');
-    likesRef.on('value', function(snapshot) {
-      const likesCount = snapshot.val();
-      document.getElementById('likeCount').innerText = likesCount || 0;
-    });
 
     // كود لإدارة الإعجاب
     function toggleLike() {
