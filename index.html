@@ -21,7 +21,7 @@
             direction: rtl;
         }
 
-        /* تنسيق أزرار الصوت العلوية */
+        /* تنسيق أزرار الصوت */
         .audio-controls {
             position: fixed;
             top: 0;
@@ -56,7 +56,7 @@
             box-shadow: 0 3px 8px rgba(29, 161, 242, 0.3);
         }
 
-        /* تنسيق معرض الصور */
+        /* معرض الصور */
         .gallery {
             max-width: 800px;
             margin: 0 auto;
@@ -73,7 +73,7 @@
             display: block;
         }
 
-        /* تنسيق زر الإعجاب */
+        /* زر الإعجاب */
         .like-container {
             position: fixed;
             bottom: 30px;
@@ -111,11 +111,6 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-
-        .fa-heart {
-            color: #fff;
-            font-size: 20px;
-        }
     </style>
 </head>
 <body>
@@ -136,7 +131,7 @@
 
     <!-- زر الإعجاب -->
     <div class="like-container">
-        <button class="like-btn" onclick="handleLike()">
+        <button class="like-btn" onclick="handleLike()" id="likeButton">
             <i class="fas fa-heart"></i>
             <span class="like-counter">0</span>
         </button>
@@ -171,25 +166,30 @@
         }
 
         // نظام الإعجاب
-        let hasLiked = false;
-        const likeBtn = document.querySelector('.like-btn');
+        const likeBtn = document.getElementById('likeButton');
         const counter = document.querySelector('.like-counter');
+        const storageKey = 'deviceLikeId';
         
-        db.ref('like').on('value', snap => {
-            const likes = snap.val() || 0;
-            counter.textContent = likes;
+        // توليد معرف الجهاز
+        let deviceId = localStorage.getItem(storageKey);
+        if (!deviceId) {
+            deviceId = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem(storageKey, deviceId);
+        }
+
+        // تحديث العداد
+        db.ref('likes').on('value', (snap) => {
+            const likes = snap.val() || {};
+            counter.textContent = Object.keys(likes).length;
+            likeBtn.classList.toggle('active', likes[deviceId]);
         });
 
+        // معالجة الإعجاب
         function handleLike() {
-            if (!hasLiked) {
-                db.ref('like').transaction(val => (val || 0) + 1);
-                likeBtn.classList.add('active');
-                setTimeout(() => likeBtn.classList.remove('active'), 600);
-                hasLiked = true;
-            } else {
-                db.ref('like').transaction(val => (val || 0) - 1);
-                hasLiked = false;
-            }
+            const ref = db.ref(`likes/${deviceId}`);
+            ref.transaction(current => {
+                return current === null ? true : null;
+            });
         }
 
         // توليد الصور تلقائياً
