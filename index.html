@@ -162,17 +162,35 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // إدارة الصوت
+        // نظام الصوت المحسّن
         const audioTrack = new Audio('shahad.mp3');
-        
+        let isPlaying = false;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                pauseAudio();
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            pauseAudio();
+        });
+
         function playAudio() {
-            audioTrack.play();
-            document.querySelector('.fa-play').classList.replace('fa-play', 'fa-pause');
+            audioTrack.play()
+                .then(() => {
+                    isPlaying = true;
+                    document.querySelector('.fa-play').classList.replace('fa-play', 'fa-pause');
+                })
+                .catch(error => console.log('خطأ في تشغيل الصوت:', error));
         }
 
         function pauseAudio() {
-            audioTrack.pause();
-            document.querySelector('.fa-pause').classList.replace('fa-pause', 'fa-play');
+            if (isPlaying) {
+                audioTrack.pause();
+                isPlaying = false;
+                document.querySelector('.fa-pause').classList.replace('fa-pause', 'fa-play');
+            }
         }
 
         // نظام الإعجاب
