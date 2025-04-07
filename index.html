@@ -8,23 +8,31 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 100px;
+            padding: 80px 20px 120px;
+            direction: rtl;
         }
 
-        /* تحسينات أزرار الصوت */
-        .audio-panel {
+        /* تنسيق أزرار الصوت العلوية */
+        .audio-controls {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
             display: flex;
             justify-content: center;
             gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
 
@@ -33,26 +41,43 @@
             color: white;
             border: none;
             padding: 12px 30px;
-            border-radius: 30px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(29, 161, 242, 0.2);
-            transition: all 0.3s;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
 
         .audio-btn:hover {
+            background: #1991db;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(29, 161, 242, 0.3);
+            box-shadow: 0 3px 8px rgba(29, 161, 242, 0.3);
         }
 
-        /* تحسينات زر الإعجاب */
+        /* تنسيق معرض الصور */
+        .gallery {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        /* تنسيق زر الإعجاب */
         .like-container {
             position: fixed;
             bottom: 30px;
-            right: 30px;
+            left: 30px;
             z-index: 1000;
         }
 
@@ -60,14 +85,15 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px 40px;
+            padding: 15px 35px;
             background: #000;
             color: #fff;
-            border-radius: 50px;
-            font-size: 20px;
+            border-radius: 30px;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
         }
 
         .like-btn:hover {
@@ -86,26 +112,15 @@
             100% { transform: scale(1); }
         }
 
-        /* تعديلات معرض الصور */
-        .gallery {
-            max-width: 1000px;
-            margin: 100px auto 50px;
-        }
-
-        .gallery img {
-            width: 100%;
-            height: auto;
-            max-height: 80vh;
-            object-fit: contain;
-            margin-bottom: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: block;
+        .fa-heart {
+            color: #fff;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="audio-panel">
+    <!-- أزرار التحكم في الصوت -->
+    <div class="audio-controls">
         <button class="audio-btn" onclick="playAudio()">
             <i class="fas fa-play"></i>
             تشغيل الصوت
@@ -116,23 +131,56 @@
         </button>
     </div>
 
+    <!-- معرض الصور -->
     <div class="gallery"></div>
 
+    <!-- زر الإعجاب -->
     <div class="like-container">
         <button class="like-btn" onclick="handleLike()">
-            <i class="fas fa-heart like-icon"></i>
+            <i class="fas fa-heart"></i>
             <span class="like-counter">0</span>
         </button>
     </div>
 
     <script>
-        // الكود البرمجي مع تحسينات الإعجاب
-        const firebaseConfig = { /* ... نفس إعدادات فايربيز ... */ };
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUw_0GfQmKhMDSEO-duWq1VuaV42v0lCc",
+            authDomain: "likemeshahad.firebaseapp.com",
+            databaseURL: "https://likemeshahad-default-rtdb.firebaseio.com",
+            projectId: "likemeshahad",
+            storageBucket: "likemeshahad.firebasestorage.app",
+            messagingSenderId: "298021285830",
+            appId: "1:298021285830:web:551d8f9e2b57caff6fccc7",
+            measurementId: "G-4SYFM5GJ41"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // إدارة الصوت
+        const audioTrack = new Audio('shahad.mp3');
         
-        // ... بقية الكود البرمجي كما هو ...
+        function playAudio() {
+            audioTrack.play();
+            document.querySelector('.fa-play').classList.replace('fa-play', 'fa-pause');
+        }
+
+        function pauseAudio() {
+            audioTrack.pause();
+            document.querySelector('.fa-pause').classList.replace('fa-pause', 'fa-play');
+        }
+
+        // نظام الإعجاب
+        let hasLiked = false;
+        const likeBtn = document.querySelector('.like-btn');
+        const counter = document.querySelector('.like-counter');
         
-        const handleLike = () => {
-            const likeBtn = document.querySelector('.like-btn');
+        db.ref('like').on('value', snap => {
+            const likes = snap.val() || 0;
+            counter.textContent = likes;
+        });
+
+        function handleLike() {
             if (!hasLiked) {
                 db.ref('like').transaction(val => (val || 0) + 1);
                 likeBtn.classList.add('active');
@@ -140,10 +188,19 @@
                 hasLiked = true;
             } else {
                 db.ref('like').transaction(val => (val || 0) - 1);
-                likeBtn.style.backgroundColor = '#000';
                 hasLiked = false;
             }
-        };
+        }
+
+        // توليد الصور تلقائياً
+        const gallery = document.querySelector('.gallery');
+        for (let i = 1; i <= 9; i++) {
+            const img = document.createElement('img');
+            img.src = `image${i}.jpg`;
+            img.alt = `صورة ${i}`;
+            img.loading = "lazy";
+            gallery.appendChild(img);
+        }
     </script>
 </body>
 </html>
