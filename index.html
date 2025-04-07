@@ -1,77 +1,109 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحة تفاعلية</title>
+    <title>صفحة شاهـد</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
+        /* التنسيقات هنا */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery img:hover {
+            transform: scale(1.03);
+        }
+        
+        .audio-panel {
             text-align: center;
-            margin: 20px;
+            margin: 40px 0;
         }
-        .image-container {
-            margin-bottom: 20px;
-        }
-        .image-container img {
-            width: 80%;
-            max-width: 600px;
-            margin-bottom: 10px;
-        }
-        .buttons {
-            margin: 20px 0;
-        }
-        .like-button {
-            background-color: #f1c40f;
+        
+        .audio-btn {
+            background: #1da1f2;
+            color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 30px;
+            border-radius: 30px;
             cursor: pointer;
-        }
-        .like-button.liked {
-            background-color: #e74c3c;
-        }
-        .audio-controls {
-            margin: 10px 0;
-        }
-        #likeStatus {
             font-size: 18px;
-            margin-top: 10px;
+            margin: 0 15px;
+            transition: all 0.3s;
+        }
+        
+        .audio-btn:hover {
+            background: #1991db;
+            box-shadow: 0 5px 15px rgba(29, 161, 242, 0.3);
+        }
+        
+        .like-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 35px;
+            background: #000;
+            color: #fff;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .like-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .like-icon {
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
+    <div class="gallery"></div>
 
-    <h1>مرحبا بك في الصفحة التفاعلية</h1>
-
-    <!-- Controls for Audio -->
-    <div class="audio-controls">
-        <button id="playBtn">تشغيل الصوت</button>
-        <button id="pauseBtn">إيقاف الصوت</button>
+    <div class="audio-panel">
+        <button class="audio-btn" onclick="playAudio()">▶ تشغيل الموسيقى</button>
+        <button class="audio-btn" onclick="pauseAudio()">⏸ إيقاف مؤقت</button>
     </div>
 
-    <!-- Displaying Images -->
-    <div class="image-container">
-        <img src="image1.jpg" alt="صورة 1">
-        <img src="image2.jpg" alt="صورة 2">
-        <img src="image3.jpg" alt="صورة 3">
+    <div class="like-container">
+        <button class="like-btn" onclick="handleLike()">
+            <span class="like-icon">❤️</span>
+            <span class="like-counter">0</span>
+        </button>
     </div>
-
-    <!-- Like Button -->
-    <div class="buttons">
-        <button id="likeBtn" class="like-button">إعجاب</button>
-    </div>
-
-    <div id="likeStatus"></div>
-
-    <!-- Audio File -->
-    <audio id="audio" src="shahad.mp3"></audio>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
 
     <script>
-        // Firebase Configuration
+        // تهيئة فايربيز
         const firebaseConfig = {
             apiKey: "AIzaSyDUw_0GfQmKhMDSEO-duWq1VuaV42v0lCc",
             authDomain: "likemeshahad.firebaseapp.com",
@@ -82,58 +114,47 @@
             appId: "1:298021285830:web:551d8f9e2b57caff6fccc7",
             measurementId: "G-4SYFM5GJ41"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database(app);
-
-        // Audio Controls
-        document.getElementById('playBtn').addEventListener('click', function() {
-            document.getElementById('audio').play();
-        });
-
-        document.getElementById('pauseBtn').addEventListener('click', function() {
-            document.getElementById('audio').pause();
-        });
-
-        // Like Button Interaction
-        let likeBtn = document.getElementById('likeBtn');
-        let likeStatus = document.getElementById('likeStatus');
+        // إدارة الصوت
+        const audioTrack = new Audio('shahad.mp3');
         
-        likeBtn.addEventListener('click', function() {
-            let liked = likeBtn.classList.contains('liked');
-            
-            if (liked) {
-                likeBtn.classList.remove('liked');
-                likeStatus.innerHTML = 'إعجابك تمت إزالته';
-                
-                // Update Firebase to remove like
-                firebase.database().ref('likes/').set({
-                    liked: false
-                });
-            } else {
-                likeBtn.classList.add('liked');
-                likeStatus.innerHTML = 'لقد أعجبت بالمحتوى!';
-                
-                // Update Firebase to add like
-                firebase.database().ref('likes/').set({
-                    liked: true
-                });
-            }
+        const playAudio = () => audioTrack.play();
+        const pauseAudio = () => audioTrack.pause();
+
+        // نظام الإعجاب
+        let currentLikes = 0;
+        let hasLiked = false;
+        const likeBtn = document.querySelector('.like-btn');
+        const counter = document.querySelector('.like-counter');
+        
+        db.ref('like').on('value', snap => {
+            currentLikes = snap.val() || 0;
+            counter.textContent = currentLikes;
         });
 
-        // Firebase Real-Time Listener for Like Status
-        firebase.database().ref('likes/').on('value', function(snapshot) {
-            const data = snapshot.val();
-            if (data && data.liked) {
-                likeBtn.classList.add('liked');
-                likeStatus.innerHTML = 'لقد أعجبت بالمحتوى!';
+        const handleLike = () => {
+            if (!hasLiked) {
+                db.ref('like').transaction(val => (val || 0) + 1);
+                likeBtn.style.backgroundColor = '#e0245e';
+                hasLiked = true;
             } else {
-                likeBtn.classList.remove('liked');
-                likeStatus.innerHTML = 'إعجابك تمت إزالته';
+                db.ref('like').transaction(val => (val || 0) - 1);
+                likeBtn.style.backgroundColor = '#000';
+                hasLiked = false;
             }
-        });
+        };
+
+        // توليد معرض الصور
+        const gallery = document.querySelector('.gallery');
+        for (let i = 1; i <= 9; i++) {
+            gallery.innerHTML += `
+                <img src="image${i}.jpg" 
+                     alt="صورة ${i}" 
+                     loading="lazy">
+            `;
+        }
     </script>
-
 </body>
 </html>
