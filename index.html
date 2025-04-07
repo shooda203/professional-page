@@ -21,7 +21,6 @@
             direction: rtl;
         }
 
-        /* تنسيق أزرار الصوت */
         .audio-controls {
             position: fixed;
             top: 0;
@@ -56,7 +55,6 @@
             box-shadow: 0 3px 8px rgba(29, 161, 242, 0.3);
         }
 
-        /* معرض الصور */
         .gallery {
             max-width: 800px;
             margin: 0 auto;
@@ -73,12 +71,24 @@
             display: block;
         }
 
-        /* زر الإعجاب */
-        .like-container {
+        .stats-container {
             position: fixed;
             bottom: 30px;
-            left: 30px;
+            right: 30px;
             z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: #000;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .like-btn {
@@ -114,7 +124,6 @@
     </style>
 </head>
 <body>
-    <!-- أزرار التحكم في الصوت -->
     <div class="audio-controls">
         <button class="audio-btn" onclick="playAudio()">
             <i class="fas fa-play"></i>
@@ -126,11 +135,13 @@
         </button>
     </div>
 
-    <!-- معرض الصور -->
     <div class="gallery"></div>
 
-    <!-- زر الإعجاب -->
-    <div class="like-container">
+    <div class="stats-container">
+        <div class="stat-box">
+            <i class="fas fa-eye"></i>
+            <span class="view-counter">0</span>
+        </div>
         <button class="like-btn" onclick="handleLike()" id="likeButton">
             <i class="fas fa-heart"></i>
             <span class="like-counter">0</span>
@@ -138,7 +149,6 @@
     </div>
 
     <script>
-        // تهيئة Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDUw_0GfQmKhMDSEO-duWq1VuaV42v0lCc",
             authDomain: "likemeshahad.firebaseapp.com",
@@ -168,31 +178,44 @@
         // نظام الإعجاب
         const likeBtn = document.getElementById('likeButton');
         const counter = document.querySelector('.like-counter');
-        const storageKey = 'deviceLikeId';
-        
-        // توليد معرف الجهاز
-        let deviceId = localStorage.getItem(storageKey);
+        const likeStorageKey = 'deviceLikeId';
+
+        let deviceId = localStorage.getItem(likeStorageKey);
         if (!deviceId) {
             deviceId = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem(storageKey, deviceId);
+            localStorage.setItem(likeStorageKey, deviceId);
         }
 
-        // تحديث العداد
         db.ref('likes').on('value', (snap) => {
             const likes = snap.val() || {};
             counter.textContent = Object.keys(likes).length;
             likeBtn.classList.toggle('active', likes[deviceId]);
         });
 
-        // معالجة الإعجاب
         function handleLike() {
             const ref = db.ref(`likes/${deviceId}`);
-            ref.transaction(current => {
-                return current === null ? true : null;
-            });
+            ref.transaction(current => current === null ? true : null);
         }
 
-        // توليد الصور تلقائياً
+        // نظام المشاهدات
+        const viewCounter = document.querySelector('.view-counter');
+        const viewStorageKey = 'deviceViewId';
+
+        function recordView() {
+            let viewId = localStorage.getItem(viewStorageKey);
+            if (!viewId) {
+                viewId = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem(viewStorageKey, viewId);
+                db.ref(`views/${viewId}`).set(true);
+            }
+        }
+
+        db.ref('views').on('value', (snap) => {
+            const views = snap.val() || {};
+            viewCounter.textContent = Object.keys(views).length;
+        });
+
+        // توليد الصور
         const gallery = document.querySelector('.gallery');
         for (let i = 1; i <= 9; i++) {
             const img = document.createElement('img');
@@ -201,6 +224,9 @@
             img.loading = "lazy";
             gallery.appendChild(img);
         }
+
+        // تسجيل المشاهدة عند التحميل
+        window.addEventListener('load', recordView);
     </script>
 </body>
 </html>
