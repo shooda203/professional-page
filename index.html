@@ -1,89 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professional Page</title>
-  <!-- Firebase SDK -->
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-analytics.js";
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDUw_0GfQmKhMDSEO-duWq1VuaV42v0lCc",
-      authDomain: "likemeshahad.firebaseapp.com",
-      databaseURL: "https://likemeshahad-default-rtdb.firebaseio.com",
-      projectId: "likemeshahad",
-      storageBucket: "likemeshahad.firebasestorage.app",
-      messagingSenderId: "298021285830",
-      appId: "1:298021285830:web:551d8f9e2b57caff6fccc7",
-      measurementId: "G-4SYFM5GJ41"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-
-    // Database Reference for likes
-    const database = getDatabase(app);
-    const likesRef = ref(database, 'likes');
-
-    // Function to handle like button click
-    window.toggleLike = function() {
-      // Increment the like count by 1
-      set(likesRef, (currentLikes) => (currentLikes || 0) + 1);
-    };
-
-    // Listen for changes to like count
-    onValue(likesRef, (snapshot) => {
-      const likeCount = snapshot.val() || 0;
-      document.getElementById("likeCount").innerText = likeCount;
-      document.getElementById('heart').classList.toggle('liked', likeCount % 2 === 1);
-    });
-
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Page</title>
 </head>
 <body>
-  <div class="gallery">
-    <img src="image1.jpg" alt="Image 1">
-    <img src="image2.jpg" alt="Image 2">
-    <img src="image3.jpg" alt="Image 3">
-    <img src="image4.jpg" alt="Image 4">
-    <img src="image5.jpg" alt="Image 5">
-    <img src="image6.jpg" alt="Image 6">
-    <img src="image7.jpg" alt="Image 7">
-    <img src="image8.jpg" alt="Image 8">
-    <img src="image9.jpg" alt="Image 9">
-  </div>
 
-  <div class="like-container">
-    <span id="heart" class="heart-icon" onclick="toggleLike()">❤️</span>
-    <span id="likeCount" class="like-count">0</span>
-  </div>
+    <h1>Images Gallery</h1>
 
-  <!-- Add audio functionality -->
-  <audio id="myAudio" loop>
-    <source src="shahad.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-  </audio>
+    <!-- Images -->
+    <div class="gallery">
+        <img src="image1.jpg" alt="Image 1">
+        <img src="image2.jpg" alt="Image 2">
+        <img src="image3.jpg" alt="Image 3">
+        <img src="image4.jpg" alt="Image 4">
+        <img src="image5.jpg" alt="Image 5">
+        <img src="image6.jpg" alt="Image 6">
+        <img src="image7.jpg" alt="Image 7">
+        <img src="image8.jpg" alt="Image 8">
+        <img src="image9.jpg" alt="Image 9">
+    </div>
 
-  <div>
-    <button class="play-button" onclick="playAudio()">Play Audio</button>
-    <button class="pause-button" onclick="pauseAudio()">Pause Audio</button>
-  </div>
+    <!-- Audio controls -->
+    <audio id="myAudio" loop>
+        <source src="shahad.mp3" type="audio/mp3">
+    </audio>
+    <button onclick="playAudio()">Play Audio</button>
+    <button onclick="pauseAudio()">Pause Audio</button>
 
-  <script type="module">
-    // Audio control functions
-    window.playAudio = function() {
-      document.getElementById('myAudio').play();
-    }
+    <!-- Like Button -->
+    <div class="like-container">
+        <span id="heart" class="heart-icon" onclick="toggleLike()">❤️</span>
+        <span id="likeCount" class="like-count">0</span> Likes
+    </div>
 
-    window.pauseAudio = function() {
-      document.getElementById('myAudio').pause();
-    }
-  </script>
+    <!-- Firebase Setup -->
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDUw_0GfQmKhMDSEO-duWq1VuaV42v0lCc",
+          authDomain: "likemeshahad.firebaseapp.com",
+          databaseURL: "https://likemeshahad-default-rtdb.firebaseio.com",
+          projectId: "likemeshahad",
+          storageBucket: "likemeshahad.firebasestorage.app",
+          messagingSenderId: "298021285830",
+          appId: "1:298021285830:web:551d8f9e2b57caff6fccc7",
+          measurementId: "G-4SYFM5GJ41"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Reference to likes data in Firebase
+        const likesRef = ref(database, 'likes');
+
+        // Function to update like count in real-time
+        onValue(likesRef, (snapshot) => {
+            const likeCount = snapshot.val() || 0;
+            document.getElementById("likeCount").innerText = likeCount;
+            document.getElementById('heart').classList.toggle('liked', likeCount % 2 === 1);
+        });
+
+        // Function to toggle like
+        function toggleLike() {
+            set(likesRef, (currentLikes) => (currentLikes || 0) + 1).catch(error => {
+                console.error("Error updating likes: ", error);
+            });
+        }
+
+        // Audio control functions
+        function playAudio() {
+            document.getElementById('myAudio').play();
+        }
+
+        function pauseAudio() {
+            document.getElementById('myAudio').pause();
+        }
+    </script>
+
 </body>
 </html>
